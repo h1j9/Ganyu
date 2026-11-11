@@ -1,0 +1,64 @@
+plugins {
+    id 'com.android.application' version '8.7.3'
+}
+
+def releaseSigningFile = rootProject.file('../.ganyu-signing/signing.properties')
+def releaseSigning = new Properties()
+if (releaseSigningFile.isFile()) {
+    releaseSigningFile.withInputStream { releaseSigning.load(it) }
+}
+
+android {
+    namespace 'local.coloros.otastatic'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'local.coloros.otastatic'
+        minSdk 28
+        targetSdk 35
+        versionCode 11
+        versionName '1.10'
+    }
+
+    signingConfigs {
+        release {
+            if (releaseSigningFile.isFile()) {
+                storeFile new File(releaseSigningFile.parentFile, releaseSigning.getProperty('storeFile'))
+                storePassword releaseSigning.getProperty('storePassword')
+                keyAlias releaseSigning.getProperty('keyAlias')
+                keyPassword releaseSigning.getProperty('keyPassword')
+                storeType 'PKCS12'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            debuggable false
+            jniDebuggable false
+            // Keep the Xposed entry point and reflected classes intact.
+            minifyEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+tasks.configureEach {
+    if (name == 'validateSigningRelease') {
+        doFirst {
+            if (!releaseSigningFile.isFile()) {
+                throw new GradleException('Release signing is missing. Run scripts/Initialize-Signing.ps1 first.')
+            }
+        }
+    }
+}
+
+dependencies {
+    compileOnly 'de.robv.android.xposed:api:82'
+}

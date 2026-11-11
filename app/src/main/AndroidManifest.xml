@@ -1,0 +1,36 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <permission
+        android:name="local.coloros.otastatic.permission.RESTART_SETTINGS"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="local.coloros.otastatic.permission.RESTART_SETTINGS" />
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher">
+        <meta-data android:name="xposedmodule" android:value="true" />
+        <meta-data android:name="xposeddescription" android:value="自定义系统设置、OTA 卡片和软件更新页背景" />
+        <meta-data android:name="xposedminversion" android:value="82" />
+        <meta-data android:name="xposedscope" android:value="com.android.settings;com.oplus.ota" />
+
+        <activity
+            android:name=".BackgroundActivity"
+            android:enableOnBackInvokedCallback="false"
+            android:exported="true"
+            android:theme="@style/BackgroundTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
+            </intent-filter>
+        </activity>
+
+        <provider
+            android:name=".BackgroundProvider"
+            android:authorities="local.coloros.otastatic.backgrounds"
+            android:exported="true" />
+    </application>
+</manifest>
